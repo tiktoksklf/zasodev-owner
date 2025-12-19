@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <title>ZasoDev</title>
+
+  <!-- iOS PWA FULLSCREEN -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ZasoDev">
+
+  <!-- iOS theme color -->
+  <meta name="theme-color" content="#0b0d12">
+
+  <!-- App Icons -->
+  <link rel="apple-touch-icon" href="image.png">
+  <link rel="icon" type="image/png" href="image.png">
+
+  <!-- No manifest needed for iOS fullscreen PWA -->
+
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #141414;
+      --panel-soft: #1b1b1b;
+      --text: #f5c76a;        /* ALL text gold */
+      --muted: #caa94d;       /* muted gold */
+      --accent: #f5c76a;      /* gold accent */
+      --positive: #f5c76a;    /* even positive stays gold */
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #0f1115, #0b0d12);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+    }
+
+    header {
+      padding: 16px 18px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-weight: 600;
+      letter-spacing: .5px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .grid {
+      padding: 12px 14px 80px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.35);
+    }
+
+    .card h4 {
+      margin: 0 0 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .stat {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+
+    .trend {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--positive);
+    }
+
+    .section {
+      margin: 14px;
+    }
+
+    .section h3 {
+      margin: 6px 2px 10px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .projects {
+      display: grid;
+      gap: 10px;
+    }
+
+    .project {
+      background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .project:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0,0,0,.4);
+    }
+
+    .p-name {
+      font-weight: 600;
+    }
+
+    .p-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Detail view */
+    .detail {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(180deg, #0f1115, #0b0d12);
+      padding: 16px;
+      transform: translateX(100%);
+      transition: transform .25s ease;
+      z-index: 10;
+    }
+
+    .detail.active {
+      transform: translateX(0);
+    }
+
+    .back {
+      color: var(--accent);
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    /* Fake map */
+    .map {
+      height: 220px;
+      background: radial-gradient(circle at 40% 30%, #1f2937, #020617);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: .4; }
+      50% { opacity: 1; }
+      100% { opacity: .4; }
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, rgba(15,17,21,.6), rgba(15,17,21,.95));
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">ZasoDev</div>
+    <div class="sub">Owner Dashboard</div>
+  </div>
+  <div class="sub">Live</div>
+</header>
+
+<section class="grid">
+  <div class="card">
+    <h4>Visitors</h4>
+    <div class="stat" id="visitors">0</div>
+    <div class="trend">+ daily growth</div>
+  </div>
+
+  <div class="card">
+    <h4>Total Revenue</h4>
+    <div class="stat" id="revenue">$12,345.34</div>
+    <div class="trend">+ daily sales</div>
+  </div>
+
+  <div class="card">
+    <h4>Active Projects</h4>
+    <div class="stat" id="projects">0</div>
+  </div>
+
+  <div class="card">
+    <h4>Active Users</h4>
+    <div class="stat" id="users">0</div>
+  </div>
+</section>
+
+<section class="section">
+  <h3>Active Projects</h3>
+  <div class="projects" id="projectList"></div>
+</section>
+
+<section class="section">
+  <h3>Live Usage Map</h3>
+  <div class="map" id="map" style="background-image:url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg'); background-size:cover; background-position:center;"></div>
+</section>
+
+<div class="detail" id="detail">
+  <div class="back" onclick="closeDetail()">← Back</div>
+  <h2 id="detailTitle"></h2>
+  <div class="detail-grid">
+    <div class="card"><h4>Downloads</h4><div class="stat" id="dDownloads"></div></div>
+    <div class="card"><h4>Active Users</h4><div class="stat" id="dUsers"></div></div>
+    <div class="card"><h4>Revenue</h4><div class="stat" id="dRevenue"></div></div>
+  </div>
+</div>
+
+<footer>
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div>ZasoDev Internal · Simulated metrics · 30-day growth model</div>
+    <div style="display:flex; gap:14px;">
+      <span style="cursor:pointer;" onclick="goHome()">Home</span>
+      <span style="cursor:pointer;" onclick="openSettings()">Settings</span>
+    </div>
+  </div>
+</footer>
+
+<div class="detail" id="settings">
+  <div class="back" onclick="closeSettings()">← Back</div>
+  <h2>Settings</h2>
+  <div class="card">
+    <h4>Theme</h4>
+    <select id="themeSelect" style="width:100%; padding:10px; border-radius:10px; background:#0f1115; color:#fff; border:1px solid #2a2f3a;">
+      <option value="gold">Gold & Black</option>
+      <option value="white">White & Black</option>
+      <option value="red">Red & Black</option>
+    </select>
+    <button onclick="saveTheme()" style="margin-top:12px; width:100%; padding:10px; border-radius:12px; border:none; background:var(--accent); color:#000; font-weight:600;">Save</button>
+  </div>
+</div>
+
+<script>
+  /* ---- Fake 30-day growth model ---- */
+  const day = Math.min(30, Math.floor((Date.now() / 86400000) % 31));
+
+  const metrics = {
+    visitors: 1200 + day * 137,
+    revenue: 12345.34 + day * 421.58,
+    projects: 1,
+    users: 220 + day * 18
+  };
+
+  visitors.textContent = metrics.visitors.toLocaleString();
+  revenue.textContent = "$" + metrics.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  projects.textContent = metrics.projects;
+  users.textContent = metrics.users.toLocaleString();
+
+  /* ---- Project ---- */
+  const projectData = [
+    { name: "Zaso Tool v1", downloads: 18400, users: 4100, revenue: 12345 }
+  ];
+
+  const list = document.getElementById('projectList');
+
+  projectData.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'project';
+    el.innerHTML = `<div><div class="p-name">${p.name}</div><div class="p-meta">Active</div></div><div class="p-meta">View</div>`;
+    el.onclick = () => openDetail(p);
+    list.appendChild(el);
+  });
+
+  function openDetail(p) {
+    detail.classList.add('active');
+    detailTitle.textContent = p.name;
+    dDownloads.textContent = p.downloads.toLocaleString();
+    dUsers.textContent = p.users.toLocaleString();
+    dRevenue.textContent = "$" + p.revenue.toLocaleString();
+  }
+
+  function closeDetail() {
+    detail.classList.remove('active');
+  }
+
+  /* ---- Fixed map dots ---- */
+  const map = document.getElementById('map');
+  const locations = [
+    { top: 38, left: 27 },
+    { top: 42, left: 55 },
+    { top: 55, left: 62 },
+    { top: 50, left: 72 },
+    { top: 45, left: 82 },
+    { top: 65, left: 78 },
+    { top: 70, left: 32 },
+    { top: 72, left: 58 }
+  ];
+
+  locations.forEach(loc => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.style.top = loc.top + '%';
+    d.style.left = loc.left + '%';
+    map.appendChild(d);
+  });
+
+  /* ---- Navigation ---- */
+  function goHome() {
+    closeDetail();
+    closeSettings();
+  }
+
+  function openSettings() {
+    document.getElementById('settings').classList.add('active');
+  }
+
+  function closeSettings() {
+    document.getElementById('settings').classList.remove('active');
+  }
+
+  /* ---- Theme handling ---- */
+  const themes = {
+    gold: {
+      '--bg': '#0b0d12',
+      '--panel': '#141414',
+      '--panel-soft': '#1b1b1b',
+      '--text': '#f5c76a',
+      '--muted': '#caa94d',
+      '--accent': '#f5c76a',
+      '--positive': '#f5c76a'
+    },
+    white: {
+      '--bg': '#f7f7f7',
+      '--panel': '#ffffff',
+      '--panel-soft': '#ededed',
+      '--text': '#111111',
+      '--muted': '#666666',
+      '--accent': '#111111',
+      '--positive': '#111111'
+    },
+    red: {
+      '--bg': '#0b0d12',
+      '--panel': '#141414',
+      '--panel-soft': '#1b1b1b',
+      '--text': '#ef4444',
+      '--muted': '#f87171',
+      '--accent': '#ef4444',
+      '--positive': '#ef4444'
+    }
+  };
+
+  function applyTheme(name) {
+    const theme = themes[name];
+    if (!theme) return;
+    Object.keys(theme).forEach(k => document.documentElement.style.setProperty(k, theme[k]));
+    localStorage.setItem('zaso-theme', name);
+    document.getElementById('themeSelect').value = name;
+  }
+
+  function saveTheme() {
+    const val = document.getElementById('themeSelect').value;
+    applyTheme(val);
+  }
+
+  const savedTheme = localStorage.getItem('zaso-theme') || 'gold';
+  applyTheme(savedTheme);
+</script>
+
+</body>
+</html>
